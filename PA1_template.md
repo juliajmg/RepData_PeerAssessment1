@@ -1,14 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
-```{r}
+
+```r
 # Set working directory, unzip and read activity csv file.
 setwd("~/DataScienceSpecialization/ReproducibleResearch/RepData_PeerAssessment1")
 unzip("activity.zip", exdir = "~/DataScienceSpecialization/ReproducibleResearch/RepData_PeerAssessment1")
@@ -20,39 +16,68 @@ activity$date <- as.Date(activity$date, "%Y-%m-%d")
 ## What is mean total number of steps taken per day?
 
 Obtain the total number of steps per day and plot the histogram. 
-```{r}
+
+```r
 steps_per_day <- aggregate(steps ~ date, data = activity, FUN = sum)
 hist(steps_per_day$steps, main = "Total number of steps taken each day", xlab = "Total steps", col = 5)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)
+
 Calculate and report the mean and the median of total steps taken per day 
-```{r}
+
+```r
 mean(steps_per_day$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(steps_per_day$steps)     
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
 
 Obtain the mean of steps per interval for all days and construct the time series plot. 
-```{r}
+
+```r
 steps_per_interval <- aggregate(steps ~ interval, data = activity, FUN = mean)
 plot(steps_per_interval$interval, steps_per_interval$steps, type = "l", main = "Average of steps per 5 minutes intervals", xlab = "Intervals", ylab = "Average of steps" )
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)
+
 Obtain the interval with the highest number of steps for all days 
-```{r}
+
+```r
 max_steps <- steps_per_interval$interval[which.max(steps_per_interval$steps)]
 max_steps
 ```
 
+```
+## [1] 835
+```
+
 ## Imputing missing values
 Calculate and report missing values 
-```{r}
+
+```r
 sum(is.na(activity))
 ```
 
+```
+## [1] 2304
+```
+
 Filling missing values in steps taken with the mean of the 5-minutes interval for all days. 
-```{r}
+
+```r
 filling <- activity 
 #Create a for function to check every row of the column steps.
 for (i in 1:nrow(filling)){
@@ -68,21 +93,37 @@ for (i in 1:nrow(filling)){
 ```
 
 Plot a histogram of the total number of steps taken each day with the filled dataset. 
-```{r}
+
+```r
 steps_per_day_filled <- aggregate(steps ~ date, data = filling, FUN = sum)
 hist(steps_per_day_filled$steps, main = "Total number of steps taken each day (filled)", xlab = "Total steps", col = 5)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)
+
 Calculate and report the mean and median of the filled dataframe 
-```{r}
+
+```r
 mean(steps_per_day_filled$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(steps_per_day_filled$steps)     
+```
+
+```
+## [1] 10766.19
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 Create a new "DayType" variable in the dataset and check in every row if is a weekday or a weekend, and change it's name to the corresponding one. 
-```{r}
+
+```r
 DayType <- weekdays(filling$date)
 filling_with_days <- data.frame(filling, DayType, stringsAsFactors = FALSE)
 for (i in 1:nrow(filling_with_days)){
@@ -96,8 +137,11 @@ for (i in 1:nrow(filling_with_days)){
 ```
 
 Construct time series plots of the 5-minute interval and the average number of steps taken for all weekdays and all weekends. 
-```{r}
+
+```r
 library(ggplot2)
 ggplot(data = filling_with_days, aes(interval, steps)) + stat_summary(fun.y = mean, geom = "line", col = 6 , size = 1) + facet_wrap(~DayType, nrow = 2) + ggtitle("Average number of steps taken per interval, for day type") + ylab("Average number of steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)
        
